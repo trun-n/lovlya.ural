@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Уральский экспресс | Академия будущих вожатых</title>
+    <style>
+        /* ===== ОСНОВНЫЕ ЦВЕТА ИГРЫ (ГОЛУБАЯ ГАММА) ===== */
+        /* Основная голубая гамма: #2C7CB0 (тёмно-голубой), #B8D8F0 (светло-голубой), #E8F4FC (очень светлый голубой) */
+        /* Акцентный цвет: #A8D8F0, #8EC8E0 */
+        
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            /* ФОН СТРАНИЦЫ: голубой градиент от светло-голубого до более насыщенного */
+            background: linear-gradient(145deg, #B8D8F0 0%, #9DC8E5 100%);
+            font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .game {
+            max-width: 520px;
+            width: 100%;
+            background: #FFFFFF;  /* БЕЛЫЙ фон основной карточки игры */
+            border-radius: 64px;
+            box-shadow: 0 20px 35px rgba(0, 40, 80, 0.2);
+            overflow: hidden;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        /* ===== ШАПКА ИГРЫ (ТЁМНО-ГОЛУБАЯ) ===== */
+        .header {
+            background: #2C7CB0;  /* ТЁМНО-ГОЛУБОЙ фон шапки */
+            padding: 20px 20px 14px;
+            text-align: center;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+        .header p {
+            margin: 6px 0 0;
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        /* ===== ПАНЕЛЬ СТАТИСТИКИ (СВЕТЛО-ГОЛУБАЯ) ===== */
+        .stats-panel {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: #E8F4FC;  /* ОЧЕНЬ СВЕТЛЫЙ ГОЛУБОЙ фон панели */
+            gap: 12px;
+            border-bottom: 1px solid #C5E0F0;  /* СВЕТЛО-ГОЛУБАЯ граница */
+        }
+        .stat {
+            background: white;
+            border-radius: 60px;
+            padding: 6px 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: #2C7CB0;  /* ТЁМНО-ГОЛУБОЙ текст */
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+        .stat span:first-child { opacity: 0.7; }
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #2C7CB0;  /* ТЁМНО-ГОЛУБОЙ цвет цифр */
+            line-height: 1;
+        }
+
+        /* ===== ОСНОВНАЯ ИГРОВАЯ ОБЛАСТЬ ===== */
+        .game-area {
+            padding: 24px 20px;
+            background: #F0F8FF;  /* ПОЧТИ БЕЛЫЙ с голубым оттенком */
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== ЭКРАН СТАРТА ===== */
+        .start-screen {
+            text-align: center;
+            width: 100%;
+        }
+        
+        /* ===== КНОПКА СТАРТ (ГОЛУБАЯ) ===== */
+        .start-btn-large {
+            background: #5BAED2;  /* НАСЫЩЕННЫЙ ГОЛУБОЙ кнопки СТАРТ */
+            border: none;
+            border-radius: 80px;
+            padding: 20px 50px;
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.08s linear;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            width: 80%;
+            max-width: 250px;
+        }
+        .start-btn-large:active {
+            transform: scale(0.96);
+            background: #4A9EC2;  /* БОЛЕЕ ТЁМНЫЙ ГОЛУБОЙ при нажатии */
+        }
+        
+        /* ===== БЛОК ПРАВИЛ (СВЕТЛО-ГОЛУБОЙ) ===== */
+        .rules {
+            background: #E8F4FC;  /* ОЧЕНЬ СВЕТЛЫЙ ГОЛУБОЙ фон блока правил */
+            border-radius: 40px;
+            padding: 20px;
+            text-align: left;
+            margin-top: 20px;
+        }
+        .rules-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #2C7CB0;  /* ТЁМНО-ГОЛУБОЙ заголовок правил */
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .rules-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .rules-list li {
+            padding: 8px 0;
+            font-size: 0.85rem;
+            color: #2A6A8A;  /* ТЁМНО-ГОЛУБОЙ текст правил */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #D0E8F4;  /* СВЕТЛО-ГОЛУБАЯ граница */
+        }
+        .rules-list li:last-child {
+            border-bottom: none;
+        }
+        .rule-icon {
+            font-size: 1.2rem;
+            min-width: 30px;
+        }
+
+        /* ===== ИГРОВОЙ ЭКРАН (ПОСЛЕ СТАРТА) ===== */
+        .game-screen {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        .game-screen.active {
+            display: flex;
+        }
+        .start-screen.hide {
+            display: none;
+        }
+
+        /* ===== КАРТОЧКА С ПРЕДМЕТОМ (ГОЛУБОЙ ГРАДИЕНТ) ===== */
+        .item-card {
+            background: linear-gradient(145deg, #D6EAF8, #C5E0F0);  /* ГОЛУБОЙ градиент */
+            border-radius: 60px;
+            padding: 40px 20px;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 30px;
+            border: 3px solid #5BAED2;  /* ГОЛУБАЯ рамка */
+            box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+        }
+        .item-name-large {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2C7CB0;  /* ТЁМНО-ГОЛУБОЙ текст предмета */
+            background: #FFFFFF;  /* БЕЛЫЙ фон под текстом */
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 60px;
+            word-break: break-word;
+            max-width: 100%;
+        }
+
+        /* ===== ТАЙМЕР ПРЕДМЕТА (ПРОГРЕСС-БАР) ===== */
+        .item-timer-bar {
+            width: 100%;
+            height: 8px;
+            background: #C5E0F0;  /* СВЕТЛО-ГОЛУБОЙ фон прогресс-бара */
+            border-radius: 10px;
+            margin-top: 24px;
+            overflow: hidden;
+        }
+        .item-timer-fill {
+            height: 100%;
+            background: #FF8C42;  /* ОРАНЖЕВЫЙ цвет заполнения (оставлен для контраста) */
+            width: 100%;
+            border-radius: 10px;
+            transition: width 0.03s linear;
+        }
+
+        /* ===== КНОПКИ ВЫБОРА (ГОЛУБЫЕ) ===== */
+        .choice-buttons {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            margin-top: 16px;
+        }
+        .choice-btn {
+            flex: 1;
+            background: #D6EAF8;  /* СВЕТЛО-ГОЛУБОЙ фон кнопок */
+            border: none;
+            border-radius: 60px;
+            padding: 18px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.05s linear;
+            border: 2px solid #5BAED2;  /* ГОЛУБАЯ рамка */
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #2C7CB0;  /* ТЁМНО-ГОЛУБОЙ текст */
+        }
+        .choice-btn:active {
+            transform: scale(0.96);
+            background: #C5E0F0;  /* НЕМНОГО ТЕМНЕЕ при нажатии */
+        }
+
+        /* ===== КНОПКА ВЫХОДА В МЕНЮ ===== */
+        .reset-game-btn {
+            background: #E8F4FC;  /* СВЕТЛО-ГОЛУБОЙ фон */
+            border: none;
+            border-radius: 60px;
+            padding: 10px 24px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #2C7CB0;  /* ТЁМНО-ГОЛУБОЙ текст */
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .reset-game-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* ===== СТАТУСНОЕ СООБЩЕНИЕ ===== */
+        .status-msg {
+            text-align: center;
+            font-size: 0.7rem;
+            margin: 12px 0 4px;
+            color: #5B9AB5;  /* ПРИГЛУШЁННО-ГОЛУБОЙ текст */
+            font-weight: 500;
+        }
+
+        /* ===== ФУТЕР (СВЕТЛО-ГОЛУБОЙ) ===== */
+        .footer {
+            background: #E8F4FC;  /* СВЕТЛЫЙ ГОЛУБОВАТЫЙ фон */
+            text-align: center;
+            padding: 12px 16px 16px;
+            font-size: 0.65rem;
+            color: #2C7CB0;  /* ТЁМНО-ГОЛУБОЙ текст */
+            border-top: 1px solid #C5E0F0;  /* СВЕТЛО-ГОЛУБАЯ граница */
+        }
+        .footer strong {
+            font-size: 0.7rem;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        /* ===== МОДАЛЬНОЕ ОКНО (ВСПЛЫВАЮЩЕЕ) ===== */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .custom-modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .custom-modal-content {
+            background: white;
+            max-width: 340px;
+            width: 85%;
+            border-radius: 56px;
+            padding: 30px 25px;
+            text-align: center;
+            border: 4px solid #5BAED2;  /* ГОЛУБАЯ рамка */
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        .custom-modal.active .custom-modal-content {
+            transform: scale(1);
+        }
+        .modal-emoji {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+        }
+        .modal-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #2C7CB0;  /* ТЁМНО-ГОЛУБОЙ заголовок */
+            margin-bottom: 15px;
+        }
+        .modal-score-box {
+            background: linear-gradient(145deg, #D6EAF8, #C5E0F0);  /* ГОЛУБОЙ градиент */
+            border-radius: 60px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #5BAED2;  /* ГОЛУБАЯ рамка */
+        }
+        .modal-score-label {
+            font-size: 0.8rem;
+            color: #2C7CB0;
+            font-weight: 500;
+        }
+        .modal-score-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #FF8C42;  /* ОРАНЖЕВЫЙ цвет очков (оставлен для акцента) */
+            line-height: 1;
+        }
+        .modal-rank {
+            background: #E8F4FC;  /* СВЕТЛО-ГОЛУБОЙ фон */
+            border-radius: 40px;
+            padding: 12px;
+            margin: 15px 0;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #2C7CB0;
+        }
+        .modal-fact {
+            background: #F0F8FF;  /* ОЧЕНЬ СВЕТЛЫЙ ГОЛУБОЙ фон */
+            border-radius: 28px;
+            padding: 15px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #2C7CB0;
+            margin: 15px 0;
+            text-align: left;
+        }
+        .modal-close-btn {
+            background: #5BAED2;  /* ГОЛУБАЯ кнопка */
+            border: none;
+            border-radius: 60px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.1s;
+        }
+        .modal-close-btn:active {
+            transform: scale(0.96);
+            background: #4A9EC2;
+        }
+
+        /* ===== АДАПТИВ ПОД МОБИЛЬНЫЕ УСТРОЙСТВА ===== */
+        @media (max-width: 480px) {
+            .item-name-large { font-size: 1.3rem; padding: 8px 16px; }
+            .choice-btn { padding: 12px 8px; font-size: 1rem; }
+            .start-btn-large { font-size: 1.4rem; padding: 15px 30px; }
+        }
+    </style>
+</head>
+<body>
+<div class="game">
+    <!-- ШАПКА С ТЁМНО-ГОЛУБЫМ ФОНОМ -->
+    <div class="header">
+        <h1><span>🚂</span> Уральский экспресс <span>💎</span></h1>
+        <p>сортируй предметы — успевай за 2.5 секунды!</p>
+    </div>
+
+    <!-- ПАНЕЛЬ СТАТИСТИКИ СВЕТЛО-ГОЛУБАЯ -->
+    <div class="stats-panel">
+        <div class="stat"><span>⏱️</span><span class="stat-value" id="timerValue">20</span><span>сек</span></div>
+        <div class="stat"><span>🏆 очки</span><span class="stat-value" id="scoreValue">0</span></div>
+    </div>
+
+    <div class="game-area" id="gameArea">
+        <!-- ЭКРАН СТАРТА -->
+        <div class="start-screen" id="startScreen">
+            <button class="start-btn-large" id="startBtnLarge">⚡ СТАРТ</button>
+            <div class="rules">
+                <div class="rules-title">📜 Как играть</div>
+                <ul class="rules-list">
+                    <li><span class="rule-icon">🏔️</span> Относи предмет к Уральскому или НЕ Уральскому</li>
+                    <li><span class="rule-icon">⏱️</span> На ответ — 2.5 секунды</li>
+                    <li><span class="rule-icon">✅</span> Правильный ответ = +1 балл</li>
+                    <li><span class="rule-icon">🎯</span> Цель — набрать максимум за 20 секунд</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ИГРОВОЙ ЭКРАН (ПОСЛЕ СТАРТА) -->
+        <div class="game-screen" id="gameScreen">
+            <div class="item-card">
+                <div class="item-name-large" id="itemName">...</div>
+                <div class="item-timer-bar">
+                    <div class="item-timer-fill" id="itemTimerFill" style="width: 0%;"></div>
+                </div>
+            </div>
+            <div class="choice-buttons">
+                <button class="choice-btn" id="uralBtn">🏔️ Уральское</button>
+                <button class="choice-btn" id="otherBtn">❌ Не Уральское</button>
+            </div>
+            <div class="status-msg" id="statusMsg">🎯 Игра идёт! Успевай за 2.5 секунды!</div>
+            <button class="reset-game-btn" id="resetBtnInGame">🔄 Выйти в меню</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>🍀 Вожатский отряд «Академия будущих вожатых»</strong>
+        Свердловская область, город Екатеринбург
+    </div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО -->
+<div id="resultModal" class="custom-modal">
+    <div class="custom-modal-content">
+        <div class="modal-emoji">🏆</div>
+        <div class="modal-title">Игра окончена!</div>
+        <div class="modal-score-box">
+            <div class="modal-score-label">Твои очки</div>
+            <div class="modal-score-value" id="modalScore">0</div>
+        </div>
+        <div class="modal-rank" id="modalRank">звание</div>
+        <div class="modal-fact" id="modalFact">✨ интересный факт об Урале</div>
+        <button class="modal-close-btn" id="modalCloseBtn">🌟 Продолжить</button>
+    </div>
+</div>
+
+<script>
+    // ========== ПРЕДМЕТЫ (только текст, без картинок) ==========
+    const ITEMS = [
+        { name: "Малахитовая шкатулка", type: "ural" },
+        { name: "Каслинское литье", type: "ural" },
+        { name: "Тагильский поднос", type: "ural" },
+        { name: "Златоустовский клинок", type: "ural" },
+        { name: "Самоцвет яшма", type: "ural" },
+        { name: "Чугунная статуэтка", type: "ural" },
+        { name: "Хозяйка Медной горы", type: "ural" },
+        { name: "Уральский малахит", type: "ural" },
+        { name: "Родонит", type: "ural" },
+        { name: "Невьянская башня", type: "ural" },
+        { name: "Сысертский фарфор", type: "ural" },
+        { name: "Гжель", type: "other" },
+        { name: "Дымковская игрушка", type: "other" },
+        { name: "Хохлома", type: "other" },
+        { name: "Матрёшка", type: "other" },
+        { name: "Балалайка", type: "other" },
+        { name: "Жостовский поднос", type: "other" },
+        { name: "Янтарь", type: "other" }
+    ];
+
+    // ФАКТЫ ОБ УРАЛЕ
+    const FACTS = [
+        "✨ Малахит — визитная карточка Урала. В Эрмитаже есть Малахитовая гостиная весом более 2 тонн.",
+        "✨ Каслинское литьё — чугунные кружева, известные во всём мире.",
+        "✨ Тагильский поднос отличается яркой цветочной росписью по цветному фону.",
+        "✨ Златоустовская гравюра на стали — уникальное искусство.",
+        "✨ Уральские самоцветы — более 50 видов драгоценных камней.",
+        "✨ Данила-мастер из сказов Бажова — образ реального камнереза.",
+        "✨ По территории региона проходит граница между Европой и Азией, на которой установлен обелиск «Европа-Азия»",
+        "✨ Невьянская наклонная башня — первая падающая башня в России.",
+        "✨ Екатеринбург — один из ведущих театральных центров России, в городе действует 24 театра.",
+        "✨ Уральские горы — одни из самых древних в мире, они протягиваются на 2500 км."
+    ];
+
+    let gameActive = false;
+    let roundTimer = null;
+    let roundTimeLeft = 20;
+    
+    let currentItem = null;
+    let itemTimer = null;
+    let itemTimeLeft = 2.5;
+    let canAnswer = true;
+    
+    let score = 0;
+
+    // DOM элементы
+    const timerValueSpan = document.getElementById("timerValue");
+    const scoreValueSpan = document.getElementById("scoreValue");
+    const itemNameSpan = document.getElementById("itemName");
+    const itemTimerFill = document.getElementById("itemTimerFill");
+    const statusMsgSpan = document.getElementById("statusMsg");
+    
+    const startScreen = document.getElementById("startScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const startBtnLarge = document.getElementById("startBtnLarge");
+    const resetBtnInGame = document.getElementById("resetBtnInGame");
+    const uralBtn = document.getElementById("uralBtn");
+    const otherBtn = document.getElementById("otherBtn");
+    
+    const modal = document.getElementById("resultModal");
+    const modalScore = document.getElementById("modalScore");
+    const modalRank = document.getElementById("modalRank");
+    const modalFact = document.getElementById("modalFact");
+    const modalCloseBtn = document.getElementById("modalCloseBtn");
+
+    function getRandomItem() {
+        return { ...ITEMS[Math.floor(Math.random() * ITEMS.length)] };
+    }
+    
+    function getRandomFact() {
+        return FACTS[Math.floor(Math.random() * FACTS.length)];
+    }
+    
+    function getRank(score) {
+        if (score >= 20) return "👑 Царь горы";
+        if (score >= 14) return "⭐ Хранитель самоцветов";
+        if (score >= 8) return "🔨 Знаток Урала";
+        if (score >= 4) return "🪶 Ученик мастера";
+        return "🌱 Новичок";
+    }
+    
+    function showModal() {
+        modalScore.innerText = score;
+        modalRank.innerText = getRank(score);
+        modalFact.innerText = getRandomFact();
+        modal.classList.add("active");
+    }
+    
+    function hideModal() {
+        modal.classList.remove("active");
+    }
+    
+    function showStartScreen() {
+        startScreen.style.display = "block";
+        gameScreen.style.display = "none";
+    }
+    
+    function showGameScreen() {
+        startScreen.style.display = "none";
+        gameScreen.style.display = "flex";
+    }
+    
+    function stopGameAndShowModal() {
+        if (roundTimer) clearInterval(roundTimer);
+        if (itemTimer) clearInterval(itemTimer);
+        
+        gameActive = false;
+        showModal();
+    }
+    
+    function onItemTimeout() {
+        if (!gameActive) return;
+        if (canAnswer) {
+            canAnswer = false;
+        }
+        loadNextItem();
+    }
+    
+    function loadNextItem() {
+        if (!gameActive) return;
+        
+        currentItem = getRandomItem();
+        itemTimeLeft = 2.5;
+        canAnswer = true;
+        
+        itemNameSpan.innerText = currentItem.name;
+        itemTimerFill.style.width = "100%";
+        
+        if (itemTimer) clearInterval(itemTimer);
+        itemTimer = setInterval(() => {
+            if (!gameActive) return;
+            itemTimeLeft -= 0.03;
+            if (itemTimeLeft <= 0) {
+                itemTimeLeft = 0;
+                itemTimerFill.style.width = "0%";
+                if (itemTimer) clearInterval(itemTimer);
+                onItemTimeout();
+            } else {
+                const percent = (itemTimeLeft / 2.5) * 100;
+                itemTimerFill.style.width = `${Math.max(0, percent)}%`;
+            }
+        }, 30);
+    }
+    
+    function handleAnswer(type) {
+        if (!gameActive || !canAnswer || !currentItem) return;
+        
+        const isUral = currentItem.type === "ural";
+        const isCorrect = (type === "ural" && isUral) || (type === "other" && !isUral);
+        
+        if (isCorrect) {
+            score++;
+            statusMsgSpan.innerText = "✅ Правильно! +1 балл";
+        } else {
+            statusMsgSpan.innerText = `❌ Неправильно! Это ${isUral ? "уральское" : "не уральское"}`;
+        }
+        
+        canAnswer = false;
+        
+        if (itemTimer) {
+            clearInterval(itemTimer);
+            itemTimer = null;
+        }
+        
+        updateUI();
+        
+        setTimeout(() => {
+            if (gameActive) {
+                loadNextItem();
+            }
+        }, 200);
+    }
+    
+    function startGame() {
+        if (gameActive) return;
+        
+        if (roundTimer) clearInterval(roundTimer);
+        if (itemTimer) clearInterval(itemTimer);
+        
+        score = 0;
+        roundTimeLeft = 20;
+        gameActive = true;
+        canAnswer = true;
+        
+        currentItem = getRandomItem();
+        itemTimeLeft = 2.5;
+        itemNameSpan.innerText = currentItem.name;
+        itemTimerFill.style.width = "100%";
+        statusMsgSpan.innerText = "🎯 Игра идёт! Успевай за 2.5 секунды!";
+        
+        showGameScreen();
+        updateUI();
+        
+        if (itemTimer) clearInterval(itemTimer);
+        itemTimer = setInterval(() => {
+            if (!gameActive) return;
+            itemTimeLeft -= 0.03;
+            if (itemTimeLeft <= 0) {
+                itemTimeLeft = 0;
+                itemTimerFill.style.width = "0%";
+                if (itemTimer) clearInterval(itemTimer);
+                onItemTimeout();
+            } else {
+                const percent = (itemTimeLeft / 2.5) * 100;
+                itemTimerFill.style.width = `${Math.max(0, percent)}%`;
+            }
+        }, 30);
+        
+        roundTimer = setInterval(() => {
+            if (!gameActive) return;
+            roundTimeLeft--;
+            updateUI();
+            
+            if (roundTimeLeft <= 0) {
+                clearInterval(roundTimer);
+                clearInterval(itemTimer);
+                gameActive = false;
+                stopGameAndShowModal();
+            }
+        }, 1000);
+    }
+    
+    function fullReset() {
+        if (roundTimer) clearInterval(roundTimer);
+        if (itemTimer) clearInterval(itemTimer);
+        
+        gameActive = false;
+        score = 0;
+        roundTimeLeft = 20;
+        currentItem = null;
+        
+        updateUI();
+        showStartScreen();
+        hideModal();
+    }
+    
+    function updateUI() {
+        timerValueSpan.innerText = roundTimeLeft;
+        scoreValueSpan.innerText = score;
+    }
+    
+    // Привязка событий
+    startBtnLarge.addEventListener("click", startGame);
+    resetBtnInGame.addEventListener("click", fullReset);
+    uralBtn.addEventListener("click", () => handleAnswer("ural"));
+    otherBtn.addEventListener("click", () => handleAnswer("other"));
+    modalCloseBtn.addEventListener("click", () => {
+        hideModal();
+        fullReset();
+    });
+    
+    // Начальное состояние
+    showStartScreen();
+    updateUI();
+</script>
+</body>
+</html>
